@@ -1,0 +1,47 @@
+Required language features:
+* classes
+* inheritance with 'extends'
+* template strings
+- default args
+- Promises
+* one other feature ('let'?)
+* bonus: generator
+
+class Card
+- suit
+- rank (2-9, J, Q, K, A)
+
+deck is array of cards?
+
+class Player
+- cards : array
+- hardTotal  : current total ("A" = 1)
+- softTotal  : current total ("A" = 11)
+
+class User extends Player
+- nextMove() : returns 1 (hit) or 0 (stay)
+  - prompt user for input USE PROMISE?
+
+class Dealer extends Player
+- nextMove() :
+  - if hardTotal < 17 : 1 (hit)
+  - else : 0 (stay)
+
+function game()
+- build deck
+  - for each suit, use generator with for...of loop
+- shuffle
+- deal
+- function hand()
+  - for each player:
+    - call nextMove()
+    - if 0 (stay), record score
+      // logic for score
+    - if 1 (hit):
+      - check hardTotal
+        - if > 21 : other player wins
+        - else proceed
+  - check each player's score
+  - if all are truthy:
+    - compare scores & return winner
+  - else recurse
