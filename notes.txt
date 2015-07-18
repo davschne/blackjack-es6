@@ -34,14 +34,20 @@ function game()
 - deal
 - function hand()
   - for each player:
-    - call nextMove()
-    - if 0 (stay), record score
+  function turn(player)
+    - call player.hit()
+      - user: prompt for input
+    - if false (stand), return score
       // logic for score
-    - if 1 (hit):
+    - if true (hit):
       - check hardTotal
         - if > 21 : other player wins
-        - else proceed
-  - check each player's score
-  - if all are truthy:
-    - compare scores & return winner
-  - else recurse
+        - else player.hit()
+  - compare scores & return winner
+
+TO DO :
+  - Should error for "bust" be thrown in addCard()?
+  - Greet player, build deck, shuffle, deal
+  - Taking user input in hit() method
+  - determineWinner
+  - bust

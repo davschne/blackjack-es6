@@ -26,15 +26,17 @@ class Player {
     this.softTotal = 0;
   }
   addCard(card) {
+    // invariants:
+    //   never add a card if hardTotal >= 21
+    //   never add a card if softTotal == 21
     this.cards.push(card);
     // update hardTotal, softTotal
     if (card.rank === "A") {
       // Ace
       this.hardTotal += 1;
+      this.softTotal += 11;
       if (this.softTotal > 21) {
-        this.softTotal += 1;
-      } else {
-        this.softTotal += 11;
+        this.softTotal -= 10;
       }
     } else if (typeof card.rank === "string") {
       // Face cards
@@ -46,13 +48,25 @@ class Player {
       this.softTotal += card.rank;
     }
   }
+  getTotal() {
+    if (this.hardTotal === 21 || this.softTotal === 21) {
+      return 21;
+    } else if (this.hardTotal > 21) {
+      throw new Error(this);           // BUST
+    } else if (this.softTotal > 21) {
+      return this.hardTotal;
+    } else {
+      return this.softTotal;
+    }
+  }
 }
 
 class User extends Player { // "INHERITANCE"
   constructor() {
     super();
+    this.name = "Player";
   }
-  nextMove() {
+  hit() {
     // TODO: prompt user for input
   }
   showCards() {
@@ -66,13 +80,54 @@ class User extends Player { // "INHERITANCE"
 
 class Dealer extends Player {
   constructor() {
-    super()
+    super();
+    this.name = "Dealer";
   }
-  nextMove() {
+  hit() {
     if (hardTotal < 17) {
-      return 1; // hit
+      return true; // hit
     } else {
-      return 0; // stay
+      return false; // stand
     }
   }
+  showCards() {
+    var output = "XX"; // first card is face down
+    for (let i = 1; i < this.cards.length; i++) { // LET BINDING
+      output += ` ${this.cards[i].show()}`; // TEMPLATE STRING
+    }
+    return output;
+  }
 }
+
+function game() {
+
+  function turnLoop() {
+    if (!player.hit) {
+      return;
+    } else {
+      player.addCard(deck.pop());
+      console.log(`${player.name}'s cards: ${player.showCards()}`);
+      return Promise.resolve().then(turnLoop);
+    }
+  }
+
+  function determineWinner(players) {}
+
+  function bust(player) {}
+
+  var players = [new User(), new Dealer()];
+  // build deck
+  // shuffle deck
+  // deal cards
+  players.forEach( (player) => {
+    Promise.resolve()
+      .then(turnLoop)
+      .catch( (err) => {
+        bust(player);
+      });
+  }).then( () => {
+    determineWinner(players);
+  });
+}
+
+game();
