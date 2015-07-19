@@ -4,7 +4,7 @@
   "description": "\"Simple commandline Blackjack game demonstrating new language features in ECMAScript 6\"",
   "main": "blackjack.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --compilers js:babel/register"
   },
   "repository": {
     "type": "git",
