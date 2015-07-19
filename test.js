@@ -9,16 +9,18 @@ function *iterateRanks() {
   yield "A";
 }
 
-function buildDeck(numDecks) {
+function buildDeck(numPacks) {
   var deck = [];
   var suits = ["♠", "♣", "♡", "♢"];
-  for (let d = 0; d < numDecks; d++) {
+  for (let d = 0; d < numPacks; d++) {
     for (let s = 0; s < suits.length; s++) {
       for (let r of iterateRanks()) {
         deck.push(new Card(r, suits[s]));
       }
     }
   }
+  console.log(`Deck: ${deck.length} cards
+    `);
   shuffle(deck);
   return deck;
 }
