@@ -1,4 +1,10 @@
-process.stdin.setEncoding("utf8");
+// var readline = require("readline");
+// process.stdin.setEncoding("utf8");
+
+// var rl = readline.createInterface({
+//   input: process.stdin,
+//   output: process.stdout,
+// });
 
 var Card = require("./Card");
 // var Player = require("./Player");
@@ -59,11 +65,15 @@ function game() {
   }
 
   function turnLoop(player) {
+    console.log(`${player.name}'s turn...\n`);
     return player.hit().then(function(hit) {
+      console.log('hit is ', hit);
       if (!hit) {
         // base case
+        console.log('hit was falsy');
         return;
       } else {
+        console.log('hit was true');
         // recursive case
         player.addCard(deck.pop());
         console.log(`${player.name} hits.`);
@@ -85,20 +95,30 @@ Let's play some Blackjack!
   var deck = buildDeck(1); // Here we build the deck from a single pack
   deal(players, deck);
 
-  Promise.resolve().then(function() {
-    return players.reduce( (sequence, player) => {
-      return sequence.then(function() {
-        Promise.resolve(player)
-          .then(turnLoop)
-          .catch( (err) => {
-            bust(player);
-          });
-      });
-    }, Promise.resolve());
-  }).then( () => {
-    console.log("Game over.");
-    determineWinner(players);
-  });
+  // This is working!
+  Promise.resolve(players[0]).then(turnLoop)
+    .then(function() {
+      return Promise.resolve(players[1]).then(turnLoop);
+    })
+    .then( () => {
+      console.log("Game over.");
+      determineWinner(players);
+    });
+
+  // Promise.resolve().then(function() {
+  //   return players.reduce( (sequence, player) => {
+  //     return sequence.then(function() {
+  //       Promise.resolve(player)
+  //         .then(turnLoop)
+  //         .catch( (err) => {
+  //           bust(player);
+  //         });
+  //     });
+  //   }, Promise.resolve());
+  // }).then( () => {
+  //   console.log("Game over.");
+  //   determineWinner(players);
+  // });
 }
 
 game();
