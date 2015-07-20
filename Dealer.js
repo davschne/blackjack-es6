@@ -6,10 +6,10 @@ class Dealer extends Player {
     this.name = "Dealer";
   }
   hit() {
-    if (hardTotal < 17) {
-      return true; // hit
+    if (this.hardTotal < 17) {
+      return Promise.resolve(true); // hit
     } else {
-      return false; // stand
+      return Promise.resolve(false); // stand
     }
   }
   showCards() {

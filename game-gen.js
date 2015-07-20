@@ -1,5 +1,3 @@
-process.stdin.setEncoding("utf8");
-
 var Card = require("./Card");
 // var Player = require("./Player");
 var User = require("./User");
@@ -43,7 +41,7 @@ function shuffle(array) {
   }
 }
 
-function game() {
+function *game() {
 
   function deal(players, deck) {
     console.log(`The deal...
@@ -59,18 +57,17 @@ function game() {
   }
 
   function turnLoop(player) {
-    return player.hit().then(function(hit) {
-      if (!hit) {
-        // base case
-        return;
-      } else {
-        // recursive case
-        player.addCard(deck.pop());
-        console.log(`${player.name} hits.`);
-        console.log(`${player.name}'s cards: ${player.showCards()}`);
-        return Promise.resolve(player).then(turnLoop);
-      }
-    });
+    var hit = yield player;
+    if (!hit) {
+      // base case
+      return;
+    } else {
+      // recursive case
+      player.addCard(deck.pop());
+      console.log(`${player.name} hits.`);
+      console.log(`${player.name}'s cards: ${player.showCards()}`);
+      return Promise.resolve(player).then(turnLoop);
+    }
   }
 
   function determineWinner(players) {}
@@ -85,20 +82,42 @@ Let's play some Blackjack!
   var deck = buildDeck(1); // Here we build the deck from a single pack
   deal(players, deck);
 
-  Promise.resolve().then(function() {
-    return players.reduce( (sequence, player) => {
-      return sequence.then(function() {
-        Promise.resolve(player)
-          .then(turnLoop)
-          .catch( (err) => {
-            bust(player);
-          });
-      });
-    }, Promise.resolve());
-  }).then( () => {
-    console.log("Game over.");
-    determineWinner(players);
-  });
+  players.forEach(turnLoop);
+
+  console.log("Game over.");
+  determineWinner(players);
 }
 
-game();
+var it = game();
+var player = it();
+
+var readline = require("readline");
+process.stdin.setEncoding("utf8");
+
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
+
+new Promise(function yesOrNo(resolve, reject) {
+  rl.question("Hit? ", function(answer) {
+    var yes = /^y(?:es)?/i;
+    var no = /^no?/i;
+    if (yes.test(answer)) {
+      // console.log("Huzzah!");
+      resolve(true);
+    } else if (no.test(answer)) {
+      // console.log("Aw!");
+      resolve(false);
+    } else {
+      console.log("Huh?");
+      return Promise.resolve().then(yesOrNo);
+    }
+  });
+}).then(function(answer) {
+  console.log(answer);
+  it(answer);
+}).catch(function(err) {
+  console.log(err);
+});
