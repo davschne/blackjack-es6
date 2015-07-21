@@ -1,10 +1,10 @@
-// var readline = require("readline");
-// process.stdin.setEncoding("utf8");
+var readline = require("readline");
+process.stdin.setEncoding("utf8");
 
-// var rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout,
-// });
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 var Card = require("./Card");
 // var Player = require("./Player");
@@ -65,33 +65,53 @@ function game() {
   }
 
   function turnLoop(player) {
-    console.log(`${player.name}'s turn...\n`);
+    console.log(`
+${player.name}'s turn...
+`);
     return player.hit().then(function(hit) {
-      console.log('hit is ', hit);
       if (!hit) {
         // base case
-        console.log('hit was falsy');
+        console.log(`${player.name} stands.`);
         return;
       } else {
-        console.log('hit was true');
         // recursive case
-        player.addCard(deck.pop());
         console.log(`${player.name} hits.`);
+        player.addCard(deck.pop());
         console.log(`${player.name}'s cards: ${player.showCards()}`);
         return Promise.resolve(player).then(turnLoop);
       }
     });
   }
 
-  function determineWinner(players) {}
-
-  function bust(player) {}
+  function determineWinner(players) {
+    var highScore = 0;
+    var winner;
+    var tie = false;
+    for (let i = 0; i < players.length; i++) {
+      if (!players[i].bust) {
+        let score = players[i].getTotal();
+        if (score > highScore) {
+          winner = players[i];
+          highScore = score;
+        } else if (score === highScore) {
+          tie = true;
+        }
+      }
+    }
+    console.log(`Dealer's cards: ${players[players.length - 1].revealAllCards()}`);
+    if (tie) {
+      console.log(`It's a tie at ${highScore}!`);
+    } else {
+      console.log(`${winner.name} wins with a total of ${highScore}!`);
+    }
+    rl.close();
+  }
 
   console.log(`
 Let's play some Blackjack!
     `);
 
-  var players = [new User(), new Dealer()];
+  var players = [new User(rl), new Dealer()];
   var deck = buildDeck(1); // Here we build the deck from a single pack
   deal(players, deck);
 
@@ -100,9 +120,11 @@ Let's play some Blackjack!
     .then(function() {
       return Promise.resolve(players[1]).then(turnLoop);
     })
+    .catch( () => {
+      return Promise.resolve();
+    })
     .then( () => {
-      console.log("Game over.");
-      determineWinner(players);
+      return Promise.resolve(determineWinner(players));
     });
 
   // Promise.resolve().then(function() {

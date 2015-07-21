@@ -4,43 +4,44 @@ class Player {
     this.cards = [];
     this.hardTotal = 0;
     this.softTotal = 0;
+    this.bust = false;
   }
 
   addCard(card) {
 
-    // invariants:
-    //   never add a card if hardTotal >= 21
-    //   never add a card if softTotal == 21
+    this.cards.push(card);
 
-    if (this.hardTotal < 21 && this.softTotal !== 21) {
-
-      this.cards.push(card);
-
-      // update hardTotal, softTotal
-      if (card.rank === "A") {
-        // Ace
-        this.hardTotal += 1;
-        this.softTotal += 11;
-        if (this.softTotal > 21) {
-          this.softTotal -= 10;
-        }
-      } else if (typeof card.rank === "string") {
-        // Face cards
-        this.hardTotal += 10;
-        this.softTotal += 10;
-      } else {
-        // Non-face cards
-        this.hardTotal += card.rank;
-        this.softTotal += card.rank;
+    // update hardTotal, softTotal
+    if (card.rank === "A") {
+      // Ace
+      this.hardTotal += 1;
+      this.softTotal += 11;
+      if (this.softTotal > 21) {
+        this.softTotal -= 10;
       }
+    } else if (typeof card.rank === "string") {
+      // Face cards
+      this.hardTotal += 10;
+      this.softTotal += 10;
+    } else {
+      // Non-face cards
+      this.hardTotal += card.rank;
+      this.softTotal += card.rank;
+    }
+    // Check if bust
+    if (this.hardTotal > 21) {
+      console.log(`${this.name} busts!
+        `);
+      this.bust = true;
+      throw this;
     }
   }
 
   getTotal() {
     if (this.hardTotal === 21 || this.softTotal === 21) {
       return 21;
-    } else if (this.hardTotal > 21) {
-      throw new Error(this);           // BUST
+    // } else if (this.hardTotal > 21) {
+    //   throw new Error(this);           // BUST
     } else if (this.softTotal > 21) {
       return this.hardTotal;
     } else {

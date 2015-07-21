@@ -19,6 +19,13 @@ class Dealer extends Player {
     }
     return output;
   }
+  revealAllCards() {
+    var output = this.cards[0].show();
+    for (let i = 1; i < this.cards.length; i++) { // LET BINDING
+      output += ` ${this.cards[i].show()}`; // TEMPLATE STRING
+    }
+    return output;
+  }
 }
 
 module.exports = Dealer;
