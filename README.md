@@ -13,3 +13,5 @@ This simple version of Blackjack is a demonstration piece for some of the new la
   - tail-recursion optimization
 
 The game is run from the command line. It can take a single argument, the number of 52-card decks to use for the game. All user prompts during the game use asynchronous functions.
+
+At the time of writing, Node doesn't support ES6 language features, so it's best to run as `babel-node blackjack`.
