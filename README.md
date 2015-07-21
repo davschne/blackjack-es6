@@ -5,6 +5,7 @@ This simple version of Blackjack is a demonstration piece for some of the new la
   - class definitions
   - class "inheritance"
   - generator functions
+  - arrow functions
   - Promises
   - block-scope binding
   - template strings
