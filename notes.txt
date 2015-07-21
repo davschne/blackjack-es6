@@ -2,8 +2,8 @@ Required language features:
 * classes
 * inheritance with 'extends'
 * template strings
-- default args
-- Promises
+* default args
+* Promises
 * one other feature ('let'?)
 * bonus: generator
 

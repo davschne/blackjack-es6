@@ -1,17 +1,18 @@
-var readline = require("readline");
-process.stdin.setEncoding("utf8");
+var Card = require("./Card");
+var User = require("./User");
+var Dealer = require("./Dealer");
 
-var rl = readline.createInterface({
+// Commandline argument sets number of packs to use for a game
+var numPacks = process.argv[2];
+
+var rl = require("readline").createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-var Card = require("./Card");
-// var Player = require("./Player");
-var User = require("./User");
-var Dealer = require("./Dealer");
+process.stdin.setEncoding("utf8");
 
-// Generator for building the deck
+// GENERATOR for building the deck
 function *iterateRanks() {
   for (let i = 2; i < 11; i++) {
     yield i;
@@ -22,7 +23,7 @@ function *iterateRanks() {
   yield "A";
 }
 
-function buildDeck(numPacks) {
+function buildDeck(numPacks=1) { // DEFAULT PARAMETER
   var deck = [];
   var suits = ["♠", "♣", "♡", "♢"];
   for (let d = 0; d < numPacks; d++) {
@@ -49,25 +50,54 @@ function shuffle(array) {
   }
 }
 
-function game() {
+function deal(players, deck) {
+  console.log(`The deal...
+    `);
+  for (let i = 0; i < 2; i++) {
+    for (let p = 0; p < players.length; p++) {
+      players[p].addCard(deck.pop());
+    }
+  }
+  players.forEach( (player) => {
+    console.log(`${player.name}'s cards: ${player.showCards()}`);
+  });
+}
 
-  function deal(players, deck) {
-    console.log(`The deal...
-      `);
-    for (let i = 0; i < 2; i++) {
-      for (let p = 0; p < players.length; p++) {
-        players[p].addCard(deck.pop());
+
+function determineWinner(players) {
+  var highScore = 0;
+  var winner;
+  var tie = false;
+  for (let i = 0; i < players.length; i++) {
+    if (!players[i].bust) {
+      let score = players[i].getTotal();
+      if (score > highScore) {
+        winner = players[i];
+        highScore = score;
+      } else if (score === highScore) {
+        tie = true;
       }
     }
-    players.forEach( (player) => {
-      console.log(`${player.name}'s cards: ${player.showCards()}`);
-    });
   }
+  console.log(`Dealer's cards: ${players[players.length - 1].revealAllCards()}`);
+  if (tie) {
+    console.log(`
+  It's a tie at ${highScore}!
+    `);
+  } else {
+    console.log(`
+  ${winner.name} wins with a total of ${highScore}!
+    `);
+  }
+  rl.close();
+}
+
+function game() {
 
   function turnLoop(player) {
     console.log(`
-${player.name}'s turn...
-`);
+  ${player.name}'s turn...
+    `);
     return player.hit().then(function(hit) {
       if (!hit) {
         // base case
@@ -83,36 +113,12 @@ ${player.name}'s turn...
     });
   }
 
-  function determineWinner(players) {
-    var highScore = 0;
-    var winner;
-    var tie = false;
-    for (let i = 0; i < players.length; i++) {
-      if (!players[i].bust) {
-        let score = players[i].getTotal();
-        if (score > highScore) {
-          winner = players[i];
-          highScore = score;
-        } else if (score === highScore) {
-          tie = true;
-        }
-      }
-    }
-    console.log(`Dealer's cards: ${players[players.length - 1].revealAllCards()}`);
-    if (tie) {
-      console.log(`It's a tie at ${highScore}!`);
-    } else {
-      console.log(`${winner.name} wins with a total of ${highScore}!`);
-    }
-    rl.close();
-  }
-
   console.log(`
 Let's play some Blackjack!
     `);
 
   var players = [new User(rl), new Dealer()];
-  var deck = buildDeck(1); // Here we build the deck from a single pack
+  var deck = buildDeck(numPacks); // Here we build the deck from a single pack
   deal(players, deck);
 
   // This is working!
@@ -124,7 +130,7 @@ Let's play some Blackjack!
       return Promise.resolve();
     })
     .then( () => {
-      return Promise.resolve(determineWinner(players));
+      determineWinner(players);
     });
 
   // Promise.resolve().then(function() {
@@ -141,6 +147,6 @@ Let's play some Blackjack!
   //   console.log("Game over.");
   //   determineWinner(players);
   // });
-}
+};
 
 game();
