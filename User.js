@@ -19,7 +19,7 @@ class User extends Player { // "INHERITANCE"
           resolve(false);
         } else {
           console.log("Please answer 'yes' or 'no.'");
-          resolve(this.hit());
+          resolve(this.hit()); // TAIL RECURSION
         }
       });
     });

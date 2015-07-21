@@ -77,7 +77,7 @@ function turnLoop(player) {
       console.log(`${player.name} hits.`);
       player.addCard(deck.pop());
       console.log(`${player.name}'s cards: ${player.showCards()}`);
-      return Promise.resolve(player).then(turnLoop);
+      return Promise.resolve(player).then(turnLoop); // TAIL RECURSION
     }
   });
 }
@@ -137,10 +137,10 @@ Let's play some Blackjack!
     determineWinner(players);
     rl.question("Play again? > ", (answer) => {
       var yes = /^y(?:es)?/i;
-      if (yes.test(answer)) {
-        game(deck);
-      } else {
+      if (!yes.test(answer)) {
         rl.close();
+      } else {
+        game(deck); // TAIL RECURSION
       }
     });
   });

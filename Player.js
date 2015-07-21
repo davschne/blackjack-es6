@@ -40,8 +40,6 @@ class Player {
   getTotal() {
     if (this.hardTotal === 21 || this.softTotal === 21) {
       return 21;
-    // } else if (this.hardTotal > 21) {
-    //   throw new Error(this);           // BUST
     } else if (this.softTotal > 21) {
       return this.hardTotal;
     } else {
