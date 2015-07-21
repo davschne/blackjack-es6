@@ -63,6 +63,24 @@ function deal(players, deck) {
   });
 }
 
+function turnLoop(player) {
+  console.log(`
+  ${player.name}'s turn...
+  `);
+  return player.hit().then(function(hit) {
+    if (!hit) {
+      // base case
+      console.log(`${player.name} stands.`);
+      return;
+    } else {
+      // recursive case
+      console.log(`${player.name} hits.`);
+      player.addCard(deck.pop());
+      console.log(`${player.name}'s cards: ${player.showCards()}`);
+      return Promise.resolve(player).then(turnLoop);
+    }
+  });
+}
 
 function determineWinner(players) {
   var highScore = 0;
@@ -89,39 +107,22 @@ function determineWinner(players) {
   ${winner.name} wins with a total of ${highScore}!
     `);
   }
-  rl.close();
 }
 
-function game() {
-
-  function turnLoop(player) {
-    console.log(`
-  ${player.name}'s turn...
-    `);
-    return player.hit().then(function(hit) {
-      if (!hit) {
-        // base case
-        console.log(`${player.name} stands.`);
-        return;
-      } else {
-        // recursive case
-        console.log(`${player.name} hits.`);
-        player.addCard(deck.pop());
-        console.log(`${player.name}'s cards: ${player.showCards()}`);
-        return Promise.resolve(player).then(turnLoop);
-      }
-    });
-  }
+function game(deck) {
 
   console.log(`
+--------------------------
 Let's play some Blackjack!
     `);
 
+  // initialization
+
   var players = [new User(rl), new Dealer()];
-  var deck = buildDeck(numPacks); // Here we build the deck from a single pack
   deal(players, deck);
 
-  // This is working!
+  // game loop
+
   Promise.resolve(players[0]).then(turnLoop)
     .then(function() {
       return Promise.resolve(players[1]).then(turnLoop);
@@ -131,6 +132,14 @@ Let's play some Blackjack!
     })
     .then( () => {
       determineWinner(players);
+      rl.question("Play again? > ", (answer) => {
+        var yes = /^y(?:es)?/i;
+        if (yes.test(answer)) {
+          game(deck);
+        } else {
+          rl.close();
+        }
+      });
     });
 
   // Promise.resolve().then(function() {
@@ -149,4 +158,6 @@ Let's play some Blackjack!
   // });
 };
 
-game();
+var deck = buildDeck(numPacks);
+
+game(deck);

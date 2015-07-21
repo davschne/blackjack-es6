@@ -1,9 +1,4 @@
 var Player = require("./Player");
-// var readline = require("readline");
-// var rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout,
-// });
 
 class User extends Player { // "INHERITANCE"
 
@@ -11,16 +6,13 @@ class User extends Player { // "INHERITANCE"
     super();
     this.name = "User";
     this.rl = rl;
-    // console.log(this.rl);
   }
 
-  // This works!
   hit() {
     return new Promise( (resolve, reject) => {
       this.rl.question("Hit? > ", (answer) => {
         var yes = /^y(?:es)?/i;
         var no = /^no?/i;
-        var resolution;
         if (yes.test(answer)) {
           resolve(true);
         } else if (no.test(answer)) {
