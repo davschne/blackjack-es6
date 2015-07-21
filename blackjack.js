@@ -123,39 +123,27 @@ Let's play some Blackjack!
 
   // game loop
 
-  Promise.resolve(players[0]).then(turnLoop)
-    .then(function() {
-      return Promise.resolve(players[1]).then(turnLoop);
-    })
-    .catch( () => {
-      return Promise.resolve();
-    })
-    .then( () => {
-      determineWinner(players);
-      rl.question("Play again? > ", (answer) => {
-        var yes = /^y(?:es)?/i;
-        if (yes.test(answer)) {
-          game(deck);
-        } else {
-          rl.close();
-        }
+  Promise.resolve().then(function() {
+    return players.reduce( (sequence, player) => {
+      return sequence.then(function() {
+        return Promise.resolve(player).then(turnLoop);
       });
+    }, Promise.resolve());
+  })
+  .catch( () => {
+    return Promise.resolve();
+  })
+  .then( () => {
+    determineWinner(players);
+    rl.question("Play again? > ", (answer) => {
+      var yes = /^y(?:es)?/i;
+      if (yes.test(answer)) {
+        game(deck);
+      } else {
+        rl.close();
+      }
     });
-
-  // Promise.resolve().then(function() {
-  //   return players.reduce( (sequence, player) => {
-  //     return sequence.then(function() {
-  //       Promise.resolve(player)
-  //         .then(turnLoop)
-  //         .catch( (err) => {
-  //           bust(player);
-  //         });
-  //     });
-  //   }, Promise.resolve());
-  // }).then( () => {
-  //   console.log("Game over.");
-  //   determineWinner(players);
-  // });
+  });
 };
 
 var deck = buildDeck(numPacks);
